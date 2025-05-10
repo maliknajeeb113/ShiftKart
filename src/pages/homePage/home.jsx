@@ -6,11 +6,16 @@ import Services from "../../components/services/services.component";
 import RetractableTable from "../../components/Faq/Faq.component";
 import houseShift from "../../images/_Group_.svg";
 import commercialSetting from "../../images/_Group_ (1).svg";
+import petservice from "../../images/petservice.svg";
+import vehicleservice from "../../images/vehicleservice.svg";
+import corpservice from "../../images/corpservice.svg";
+import vehicleconservice from "../../images/vehicleconservice.svg";
 import officeShift from "../../images/_Group_ (2).svg";
 import storageShift from "../../images/_Group_ (3).svg";
 import industrialShift from "../../images/Group (1).svg";
 import processMove from "../../images/process.svg";
-import landingHome from "../../images/homelanding.svg";
+import banner from "../../images/banner.png";
+import landingHome from "../../images/2-people.png";
 import purpleCircle from "../../images/1purplecircle.svg";
 import orangeCircle1 from "../../images/1orangecircle.svg";
 import orangeCircle2 from "../../images/2orangecircle.svg";
@@ -20,8 +25,8 @@ import CompareTable from "../../components/CompareTable/CompareTable.component";
 import { useInView } from "react-intersection-observer";
 import AboutUs from "../aboutUs/aboutUs.component";
 import data from "../../components/Faq/faq.json";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import Popper from 'popper.js';
+import "bootstrap/dist/css/bootstrap.min.css";
+
 
 
 function Home({ setShowPopUp, loginModal, setLoginModal }) {
@@ -54,13 +59,14 @@ function Home({ setShowPopUp, loginModal, setLoginModal }) {
       setShow(true);
     }
   }, [loginModal]);
+  
   const listenToScroll = () => {
-    let heightToHideFrom = 1920;
+    let heightToHideFrom = 2900;
     const winScroll =
       document.body.scrollTop || document.documentElement.scrollTop;
     setHeight(winScroll);
 
-    if (winScroll > heightToHideFrom) {
+    if (winScroll > heightToHideFrom && window.innerWidth > 600) {
       visible && setVisible(false);
     } else {
       setVisible(true);
@@ -88,7 +94,11 @@ function Home({ setShowPopUp, loginModal, setLoginModal }) {
 
       {visible && show && (
             <div className="home-relocate-wrapper">
-              <Relocate className="relocate" setLoginModal={setLoginModal}/>
+
+              <Relocate setLoginModal={setLoginModal} />
+
+
+
             </div>
           )}
 
@@ -97,15 +107,18 @@ function Home({ setShowPopUp, loginModal, setLoginModal }) {
               <h2>Our Services</h2>
               <div className="flex services-row-one">
                 <Services img={houseShift} text={"House Shifting"} />
-                <Services
-                  img={commercialSetting}
-                  text={"Commercial Shifting"}
-                />
+                <Services img={commercialSetting} text={"Commercial Shifting"} />
                 <Services img={officeShift} text={"Office Shifting"} />
               </div>
               <div className="flex services-row-one">
                 <Services img={storageShift} text={"Storage Shifting"} />
+                <Services img={petservice} text={"Pet Shifting"} />
+                <Services img={corpservice} text={"Corporate Shifting"} />
+              </div>
+              <div className="flex services-row-one">
+                <Services img={vehicleservice} text={"Vehicle Shifting"} />
                 <Services img={industrialShift} text={"Industrial Shifting"} />
+                <Services img={vehicleconservice} text={"Vehicle Contracts"} />
               </div>
             </div>
           </div>
@@ -138,6 +151,11 @@ function Home({ setShowPopUp, loginModal, setLoginModal }) {
                   color={"#5ccc9c"}
                 />
               </div>
+              <img
+                className="process-img"
+                src={banner}
+                alt="process-icon"
+              />
             </div>
           </div>
         
@@ -173,13 +191,19 @@ function Home({ setShowPopUp, loginModal, setLoginModal }) {
   
       <div className="container py-5">
               <h2>FAQs</h2>
-              <div className="row">
-                <div className="col-12"><RetractableTable data={data} /></div>
-                <div className="col-12"><RetractableTable data={data} /></div>
+
+              <div className="container px-0">
+                <div className="row ">
+                <div className='col-12 col-lg-6 px-0'><RetractableTable data={data.data1} /></div>
+                <div className='col-12 col-lg-6 px-0'><RetractableTable data={data.data2} /></div>
+                
+                </div>
               </div>
             </div>
-    
-      <div className="container" id="process">
+          </div>
+
+          <div className="section-container" id="process">
+
             <img
               className="img-left-sticky"
               src={orangeCircle2}
@@ -190,7 +214,13 @@ function Home({ setShowPopUp, loginModal, setLoginModal }) {
               src={purpleCircle3}
               alt="process-icon"
             />
+
+            <div className="container-item-full ">
+              <AboutUs isHomePage={true}/>
+            </div>
+
               <AboutUs />
+
           </div>
           </div>
     </>

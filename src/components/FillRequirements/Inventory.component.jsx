@@ -10,7 +10,18 @@ import "./Inventory.css";
 import { useSelector, useDispatch } from 'react-redux';
 import { updateSelectedItems } from "../../redux/actions";
 
+const houseLimit={
+  "1 RK" : 200,
+  "1 BHK" : 400,
+  "2 BHK" : 600
+}
+
 const Inventory = ({ progress, setProgress, setTotalItemCount, totalItemCount, setCft }) => {
+
+  let TotalCostItems = useSelector((state) => state.TotalCostItems);
+
+  let {houseType} = useSelector((state) => state.RequirementsItems.requirements);
+
   const dispatch = useDispatch();
   const selectedItemsRedux = useSelector((state) => state.selectedItems);
   const [itemCount, setItemCount] = useState(0);
@@ -27,9 +38,26 @@ const Inventory = ({ progress, setProgress, setTotalItemCount, totalItemCount, s
     setSelectedItems(selectedItemsRedux);
   }, [setSelectedItems]);
 
+  const checkHouseLimit=(totalCftValue)=>{
+    if(totalCftValue>houseLimit[houseType]){
+      if(window.confirm(`you have exceeded the limit of ${houseLimit[houseType]} for a ${houseType} room.
+      confirm Ok, if you want to promote to a different category house or else reduce the items`)){
+        setProgress("requirement");
+      } 
+      else {
+        // do nothing as the user chooses to reduce items
+      }
+    }
+  }
+
   const handleNext = () => {
     dispatch(updateSelectedItems(selectedItems));
-    setProgress('dateselection');
+    if(TotalCostItems.cft>houseLimit[houseType]){
+      checkHouseLimit(TotalCostItems.cft)
+    }
+    else{
+      setProgress('dateselection');
+    }
   };
 
   const handlePrevious = () => {
@@ -93,8 +121,20 @@ const Inventory = ({ progress, setProgress, setTotalItemCount, totalItemCount, s
       cost: calculateCost(name, category, subItem, updatedItems[category][subItem][name].type, updatedItems[category][subItem][name].material),
     };
   
-    calculateTotalAndCft();
     setSelectedItems(updatedItems);
+
+    let totalCount = 0; let totalCft = 0;
+    for (const category in updatedItems) {
+        for (const subCategory in updatedItems[category]) {
+            for (const item in updatedItems[category][subCategory]) {
+                const { cost, count } = updatedItems[category][subCategory][item];
+                totalCount += count;
+                totalCft += count * cost;
+            }
+        }
+    }
+    setTotalItemCount(totalCount); setCft(totalCft);
+    checkHouseLimit(totalCft);
   };
   
   
@@ -122,8 +162,9 @@ const Inventory = ({ progress, setProgress, setTotalItemCount, totalItemCount, s
     updatedItems[category][subItem][name].count =
       updatedItems[category][subItem][name].count || 0;
 
-      calculateTotalAndCft();
+      // calculateTotalAndCft();
     setSelectedItems(updatedItems);
+    calculateTotalAndCft();
   };
 
   const handleMaterialChange = (name, category, subItem, material, type) => {
@@ -149,8 +190,9 @@ const Inventory = ({ progress, setProgress, setTotalItemCount, totalItemCount, s
     updatedItems[category][subItem][name].count =
       updatedItems[category][subItem][name].count || 0;
 
+      // calculateTotalAndCft();
+      setSelectedItems(updatedItems);
       calculateTotalAndCft();
-    setSelectedItems(updatedItems);
   };
 
   const calculateCost = (name, category, subItem, type, material) => {
@@ -161,22 +203,28 @@ const Inventory = ({ progress, setProgress, setTotalItemCount, totalItemCount, s
     return base + materialValue + typeValue;
   };
 
+
   const handleMinusClick = (name, category, subItem) => {
-    setSelectedItems((prevSelectedItems) => {
-      const updatedSelectedItems = { ...prevSelectedItems };
+    let updatedSelectedItems={...selectedItems};
       const currentCount = updatedSelectedItems[category]?.[subItem]?.[name]?.count || 0;
   
       if (currentCount > 0) {
-        updatedSelectedItems[category][subItem][name] = {
-          ...updatedSelectedItems[category][subItem][name],
-          count: currentCount - 1,
-        };
+        updatedSelectedItems[category][subItem][name] = {...updatedSelectedItems[category][subItem][name], count: currentCount - 1,};
       }
-  
-      return updatedSelectedItems;
-    });
-  
-    calculateTotalAndCft();
+
+      //------------calcuate CFT----------------------------------
+      let totalCount = 0; let totalCft = 0;
+      for (const category in updatedSelectedItems) {
+          for (const subCategory in updatedSelectedItems[category]) {
+              for (const item in updatedSelectedItems[category][subCategory]) {
+                  const { cost, count } = updatedSelectedItems[category][subCategory][item];
+                  totalCount += count;
+                  totalCft += count * cost;
+              }
+          }
+      }
+      setTotalItemCount(totalCount); setCft(totalCft);
+    setSelectedItems(updatedSelectedItems);
   };
   
   const renderSubItems = (subItems, category) => {
@@ -231,10 +279,12 @@ const Inventory = ({ progress, setProgress, setTotalItemCount, totalItemCount, s
               </select>
             <div className="itemDetails-child">
               <div className="itemDetails-child-inc">
-                <img
-                  src={minus}
-                  onClick={() => handleMinusClick(name, category, subItem)}
-                />
+                <button 
+                  onClick={() => handleMinusClick(name, category, subItem)}>
+                  <img
+                    src={minus} alt="Minus"/>
+                </button>
+                
                 <span>
                   {selectedItems[category]?.[subItem]?.[name]?.count || 0}
                 </span>

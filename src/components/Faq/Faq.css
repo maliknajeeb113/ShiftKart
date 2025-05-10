@@ -1,10 +1,9 @@
 .retractable-table {
     border-collapse: collapse;
     transition: transform 1s ease-in-out;
-    margin: 2rem;
+    margin: 1rem;
   }
   .retractable-table {
-    width: 100%;
     border-collapse: collapse;
   }
   
@@ -47,7 +46,6 @@
   .header-row td {
     font-size: 1.25rem;
     font-weight: 500;
-    width: 30rem;
     transition: transform 1s ease-in-out;
   }
   
@@ -62,7 +60,6 @@
   
   .data-row td {
     width: 100%;
-    width: 30rem;
     transition: transform 1s ease-in-out;
     
   }
@@ -83,15 +80,14 @@
   @media (max-width: 600px) {
     .header-row td {
       font-size: 1rem;
-      width: 17rem;
     }
     .data-row{
-      font-size: 0.75rem;
+      font-size: 0.8rem;
     }
-    .data-row td {
-        width: 17rem;
+    /* .data-row td {
+        width: max-content;
     }
     .retractable-table {
       margin: 0;
-    }
+    } */
   }

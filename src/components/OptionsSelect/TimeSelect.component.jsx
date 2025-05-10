@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./options.css";
 
-const TimeSelect = ({ onSelect, selectedTime}) => {
+const TimeSelect = ({ onSelect, selectedTime, selectedDayValue}) => {
   const [selectedRange, setSelectedRange] = useState(selectedTime);
   
   const timeRanges = [
@@ -19,11 +19,15 @@ const TimeSelect = ({ onSelect, selectedTime}) => {
   const firstRow = timeRanges.slice(0, 2);
   const secondRow = timeRanges.slice(2, 4);
 
+
   return (
     <div className="time-range-selector">
       <div className="row-select-time">
-        {[timeRanges[0], timeRanges[1]].map((range) => (
+        {[timeRanges[0], timeRanges[1]].map((range) => {
+          // let isDisable=compareTime(range.label);
+          return(
           <div
+          // disabled={isDisable}
             key={range.id}
             className={`time-range ${
               selectedRange && selectedRange.id === range.id ? "selected" : ""
@@ -32,11 +36,14 @@ const TimeSelect = ({ onSelect, selectedTime}) => {
           >
             {range.label}
           </div>
-        ))}
+        )})}
       </div>
       <div className="row-select-time">
-        {secondRow.map((range) => (
+        {secondRow.map((range) => {
+          // let isDisable=compareTime(range.label);
+          return(
           <div
+          // disabled={isDisable}
             key={range.id}
             className={`time-range ${
               selectedRange && selectedRange.id === range.id ? "selected" : ""
@@ -45,7 +52,7 @@ const TimeSelect = ({ onSelect, selectedTime}) => {
           >
             {range.label}
           </div>
-        ))}
+        )})}
       </div>
     </div>
   );

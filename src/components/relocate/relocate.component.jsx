@@ -18,7 +18,7 @@ function Relocate({setLoginModal}) {
   const [distance, setDistance] = useState(null);
   const [fromAddress, setFromAddress] = useState('');
   const [toAddress, setToAddress] = useState('');
-  const [activeTab, setActiveTab] = useState("Within City");
+  const [activeTab, setActiveTab] = useState("Local");
   const [wCity, setWCity] = useState("Bengaluru");
   const [fromCity, setFromCity] = useState(activeTab === "Between City" ? "Bengaluru" : "");
   const [toCity, setToCity] = useState(activeTab === "Between City" ? "Bengaluru" : "");
@@ -35,7 +35,7 @@ function Relocate({setLoginModal}) {
 
     e.preventDefault();
 
-    if(activeTab === "Within City" && fromAddress && toAddress) {
+    if(activeTab === "Local" && fromAddress && toAddress) {
 
     }
       else if (activeTab === "Between City" && fromCity && toCity) {
@@ -59,8 +59,6 @@ function Relocate({setLoginModal}) {
     setModalOpen(true);
   };
 
-  console.log(distance);
-
   useEffect(() => {
     calculateDistance();
   }, [fromAddress, toAddress]);
@@ -71,14 +69,18 @@ function Relocate({setLoginModal}) {
   });
 
   const handleFromPlaceChanged = () => {
-    const [place] = inputRefFrom.current.getPlaces();
+    if(!inputRefFrom?.current?.getPlaces()){
+      return;
+    }
+    const [place] = inputRefFrom?.current?.getPlaces();
     if (place) {
       setFromAddress(place.formatted_address);
     }
   };
 
   const handleToPlaceChanged = () => {
-    const [place] = inputRefTo.current.getPlaces();
+    if(!inputRefTo?.current?.getPlaces()) return;
+    const [place] = inputRefTo?.current?.getPlaces();
     if (place) {
       setToAddress(place.formatted_address);
     }
@@ -96,7 +98,6 @@ function Relocate({setLoginModal}) {
           
           if (status === 'OK' && response.rows[0].elements[0].status === 'OK') {
             setDistance(response.rows[0].elements[0].distance.text);
-            console.log(response);
             sessionStorage.setItem('fromAddress',fromAddress);
             sessionStorage.setItem('toAddress',toAddress);
             sessionStorage.setItem('distance',response.rows[0].elements[0].distance.text);
@@ -121,12 +122,12 @@ function Relocate({setLoginModal}) {
     <article className="relocate-wrapper">
       <div className="flex relocate-tabs-container">
         <button
-          onClick={() => setActiveTab("Within City")}
+          onClick={() => setActiveTab("Local")}
           className={`relocate-tab ${
-            activeTab === "Within City" ? "active" : ""
+            activeTab === "Local" ? "active" : ""
           }`}
         >
-          Within City
+          Local
         </button>
         <button
           onClick={() => setActiveTab("Between City")}
@@ -145,10 +146,10 @@ function Relocate({setLoginModal}) {
           International
         </button>
       </div>
-      {activeTab === "Within City" && (
+      {activeTab === "Local" && (
         <div className="relocate-select-city">
-          <div className="relocate-input margin-bottom-40">
-            <p className="small-desc">Select City</p>
+          <div className="relocate-input">
+            <p className="small-desc">Search From</p>
             <div className="relocate-drop-down-container">
               <DropDown
                 value={wCity}
@@ -158,26 +159,26 @@ function Relocate({setLoginModal}) {
             </div>
           </div>
           <div className="relocate-search-locality">
-            <p className="small-desc">Enter Addresses</p>
-            <div className="relocate-input margin-bottom-40">
-                  {isLoaded && (
-                <StandaloneSearchBox 
-                onLoad={ref => (inputRefFrom.current = ref)} 
-                onPlacesChanged={handleFromPlaceChanged} 
-                options={searchOptions}
-                >
-                  <input type="text" className="form-control" placeholder="From Address" />
-                </StandaloneSearchBox>
+            <p className="small-desc">Search From</p>
+            <div className="relocate-input">
+                {isLoaded && (
+              <StandaloneSearchBox 
+              onLoad={ref => (inputRefFrom.current = ref)} 
+              onPlacesChanged={handleFromPlaceChanged} 
+              options={searchOptions}>
+                <input type="text" className="relocate-input-box"placeholder="From Address" />
+              </StandaloneSearchBox>
               )}
             </div>
             <div className="relocate-input">
+            <p className="small-desc">Search To</p>
             {isLoaded && (
                 <StandaloneSearchBox 
                 onLoad={ref => (inputRefTo.current = ref)} 
                 onPlacesChanged={handleToPlaceChanged} 
                 options={searchOptions}
                 >
-                  <input type="text" className="form-control" placeholder="To Address" />
+                  <input type="text" className="relocate-input-box" placeholder="To Address" />
                 </StandaloneSearchBox>
               )}
             </div>
@@ -186,14 +187,16 @@ function Relocate({setLoginModal}) {
       )}
       {activeTab === "Between City" && (
         <div className="relocate-select-city">
+          
+          <div className="relocate-input">
           <p className="small-desc">Which city you want to move from?</p>
-
           <div className="relocate-drop-down-container margin-bottom-40">
             <DropDown
               value={fromCity}
               setValue={setFromCity}
               option={Data.IndianCitiesPinCode}
             />
+          </div>
           </div>
           <p className="small-desc">Destination city</p>
           <div className="relocate-drop-down-container">
@@ -207,6 +210,8 @@ function Relocate({setLoginModal}) {
       )}
       {activeTab === "International" && (
         <div className="relocate-select-city">
+          
+          <div className="relocate-input">
           <p className="small-desc">Source?</p>
 
           <div className="relocate-drop-down-container margin-bottom-40">
@@ -215,6 +220,7 @@ function Relocate({setLoginModal}) {
               setValue={setFromCoun}
               option={Data.International}
             />
+          </div>
           </div>
           <p className="small-desc">Destination Country</p>
           <div className="relocate-drop-down-container">
@@ -228,7 +234,7 @@ function Relocate({setLoginModal}) {
       )}
 
       <div className="cta-container">
-        <button onClick={handleSubmit} disabled={activeTab === "Within City" ? (!fromAddress || !toAddress) : ''} className="cta-button check-price">
+        <button onClick={handleSubmit} disabled={activeTab === "Local" ? (!fromAddress || !toAddress) : ''} className="cta-button check-price">
           Check Prices
         </button>
         {/* <RegisterModal isOpen={modalOpen} onClose={closeModal} postData={postData}/> */}

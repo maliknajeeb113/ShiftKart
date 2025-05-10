@@ -1,28 +1,40 @@
 
 .about-us-heading {
- text-align: center;
- padding: 3rem 0rem;
-}
-
-.about-us-para-text{
-    text-align: justify;
-    margin: 2.5rem 0;
-    font-weight: 400;
-    font-size: 1.125rem;
-    color: #757575;
-}
-.about-us-para-heading{
-    font-weight: 500;
-    font-size: 1.125rem;
-    color: black;
-}
-
-.aboutUs {
-    padding: 0rem 15rem 20rem 15rem;
-}
-
-@media (max-width: 600px) {
-    .aboutUs {
-        padding: 5rem 2rem 2rem 2rem
-    }
-}
+    text-align: center;
+   }
+   .about-us-para-heading{
+       font-weight: 500;
+       font-size: 1.125rem;
+       color: black;
+       align-self: center;
+   }
+   
+   .about-top{
+       padding-top: 7rem;
+   }
+   
+   .about-us-para-text{
+       text-align: justify;
+       margin: 2.5rem 0;
+       font-weight: 400;
+       font-size: 1.125rem;
+       color: #757575;
+   }
+   .individual-box {
+       display: flex;
+       flex-wrap: wrap; /* This allows elements to wrap as the viewport gets smaller */
+       justify-content: flex-start;
+       width: 100%;
+       margin-bottom: 3rem;
+   }
+     
+     .individual-item {
+       padding: 0.25rem 0.5rem;
+       display: flex;
+       background-color: #F6F6F6;
+       border: 1px solid #dfdfdf;
+       border-radius: 0.5rem;
+       flex-direction: row;
+       align-items: center;
+       font-size: 0.75rem;
+   }

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "./footer.css";
 import arrow from "../../images/arrow.svg";
 import logo from "../../images/SHIFTKART-LOGO.png";
@@ -8,23 +8,38 @@ import x from "../../images/x.svg";
 import insta from "../../images/insta.svg";
 
 function Footer(props) {
+
+  const [path, setPath] = useState(window.location.pathname);
+  const [hideFooter, setHideFooter] = useState(false);
+
+
+  useEffect(() => {
+    setPath(window.location.pathname);
+    if (path === "/bookings" || path === "/") {
+      setHideFooter(false);
+    } else {
+      setHideFooter(true);
+    }
+  }, [path]); 
+  
+
   return (
-    <div className="footer-wrapper">
+    <div style={{ display: hideFooter ? "none" : "" }} className="footer-wrapper">
       <div className="footer-upper-section-container align-center space-between">
         <div className="footer-list-wrapper">
-          <a>About Us</a>
+          <a href="about-us">About Us</a>
         </div>
         <div className="footer-list-wrapper">
-          <a>Customer Portal</a>
+          <a href="">Customer Portal</a>
         </div>
         <div className="footer-list-wrapper">
-          <a>Contact Us</a>
+          <a href="">Contact Us</a>
         </div>
         <div className="footer-list-wrapper">
-          <a>Write To Us</a>
+          <a href="">Write To Us</a>
         </div>
         <div className="footer-subsribe-action-container">
-          <a>Never miss an update</a>
+          <a href="">Never miss an update</a>
           <div className="center-div footer-subscriber">
             <input
               type="email"
@@ -53,10 +68,10 @@ function Footer(props) {
           <a href="https://www.instagram.com" className="flex">
             <img src={insta} atl="social-img"></img>
           </a>
-          <a className="flex">
+          <a href="#" className="flex">
             <img src={x} atl="social-img"></img>
           </a>
-          <a className="flex">
+          <a href="#" className="flex">
             <img src={be} atl="social-img"></img>
           </a>
         </div>

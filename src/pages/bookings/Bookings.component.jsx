@@ -1,85 +1,119 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Booking.css";
 import Arrow from "../../images/from-to-arrow.svg";
+import DownArrow from "../../images/downarrow2.png";
 import House from "../../images/house.svg";
 import Box from "../../images/box.svg";
 import Electic from "../../images/appliance.svg";
+import orderID from "../../images/orderID.png";
+import tag from "../../images/tag.png";
 import Distance from "../../images/distance.svg";
 import Calemder from "../../images/calender.svg";
-import { data } from "./bookings";
-const bookingData = data;
+import { getUserBookingFromBackend } from "../../API/apicalls";
+import { performLogout } from "../../components/FillRequirements/Requirement.component";
+import authmiddleware from "../../authmiddleware";
+
 function Bookings({}) {
   const [activeTab, setActiveTab] = useState(0);
+  const [bookingDatas,setBookingDatas]=useState([]);
+
+  let identifier = sessionStorage.getItem('identifier');
+  
+  const getBooking=async()=>{
+    if(identifier) {
+      
+      const bookingDataE=await getUserBookingFromBackend(identifier);
+
+      if(bookingDataE.type === 'serverError'){
+        alert("Please Try later!");
+        window.open("/", "_self");
+      } else if (bookingDataE?.type === 'invalidToken') {
+        alert("Please Try later!");
+        performLogout();
+      } else {
+        const bookingData = authmiddleware.decryptData(bookingDataE);
+        setBookingDatas(bookingData);
+      }
+    } else {
+      performLogout();
+    }
+  }
+
+  useEffect(()=>{
+    getBooking();
+  },[])
+
+
+  console.log(bookingDatas);
   return (
     <div className="bookings-wrapper">
       <h2>Bookings</h2>
       <div className="border-bottom"></div>
       <div className="bookings-content-wrapper center-div">
-        <div className="bookkings-tabs-wrapper center-div">
-          <button
-            className={`bookings-tab ${activeTab === 0 ? "tab-active" : ""}`}
-            onClick={() => setActiveTab(0)}
-          >
-            Ongoing Bookings
-          </button>
-          <button
-            className={`bookings-tab ${activeTab === 1 ? "tab-active" : ""}`}
-            onClick={() => setActiveTab(1)}
-          >
-            Upcoming Bookings
-          </button>
-          <button
-            className={`bookings-tab ${activeTab === 2 ? "tab-active" : ""}`}
-            onClick={() => setActiveTab(2)}
-          >
-            Previous Bookings
-          </button>
+
+        <div className="inventory-selection-parent">
+          <span className={`${activeTab === 0 ? "selected-inventory" : "non-selected-inventory"}`}
+            onClick={() => setActiveTab(0)}>
+            Ongoing
+          </span>
+          <span className={`${activeTab === 1 ? "selected-inventory" : "non-selected-inventory"}`}
+            onClick={() => setActiveTab(1)}>
+            Upcoming
+          </span>
+          <span className={`${activeTab === 2 ? "selected-inventory" : "non-selected-inventory"}`}
+            onClick={() => setActiveTab(2)}>
+            Previous
+          </span>
         </div>
-        <div className="bookings-data-container center-div">
-          <div className="flex">
-            <div className="bookings-from-container">
-              <h3>From</h3>
-              <p>{bookingData.toAddress}</p>
+
+
+        {bookingDatas.map((data, index) => (
+        <div className="bookings-data-container">
+            <div key={index} className="address">
+              <div className="bookings-from-container">
+                <span style={{ padding: '0.5rem 0', fontWeight: '700' }}>From</span>
+                <span>{data?.from_address}</span>
+              </div>
+              <div className="bookings-image-container">
+                <img src="arrow-image-url" alt="arrow" />
+              </div>
+              <div className="bookings-from-container">
+                <span style={{ padding: '0.5rem 0', fontWeight: '700' }}>To</span>
+                <span>{data?.to_address}</span>
+              </div>
             </div>
-            <div className="bookings-image-container">
-              {" "}
-              <img src={Arrow} alt={"arrow"}></img>
+            <div className="more-details-section">
+              <div className="bookings-deatils-option">
+                <img src={House} alt="house" />
+                <span>{data?.house_type}</span>
+              </div>
+              <div className="bookings-deatils-option">
+                <img src={Box} alt="Box" />
+                <span>{data?.additional_box} Cartons</span>
+              </div>
+              <div className="bookings-deatils-option">
+                <img src={Electic}  alt="Box" />
+                <span>{data?.total_items} Items</span>
+              </div>
+              <div className="bookings-deatils-option">
+                <img  src={Distance} alt="Box" />
+                <span>{data?.total_distance} km</span>
+              </div>
+              <div className="bookings-deatils-option">
+                <img  src={tag} alt="Box" />
+                <span>{data?.totalCost}</span>
+              </div>
+              <div className="bookings-deatils-option">
+                <img src={Calemder}  alt="Box" />
+                <span>{new Date(data?.book_date).toDateString()} onwards {data?.book_slot_time}</span>
+              </div>
             </div>
-            <div className="bookings-from-container margin-left-20">
-              <h3>To</h3>
-              <p>{bookingData.fromAddress}</p>
+            <div className="top-right-image-container">
+              <img src={orderID} alt="top-right-image" />
+              <span className="top-right-text">Order ID: {data?.OrderID}</span>
             </div>
           </div>
-          <div>
-            <div className="flex align-center more-details-section">
-              <div className="flex bookings-deatils-option">
-                <img src={House} alt="house"></img>
-                <span>{bookingData.houseType}</span>
-              </div>
-              <div className="flex bookings-deatils-option">
-                <img src={Box} alt="Box"></img>
-                <span>{bookingData.cartoonCount} Cartoons</span>
-              </div>
-              <div className="flex bookings-deatils-option">
-                <img src={Electic} alt="Box"></img>
-                <span>{bookingData.applianceCount}</span>
-              </div>
-              <div className="flex bookings-deatils-option">
-                <img src={Distance} alt="Box"></img>
-                <span>{bookingData.distance}</span>
-              </div>
-              <div className="flex bookings-deatils-option">
-                <img src={Calemder} alt="Box"></img>
-                <span>
-                  {bookingData.pickUpDate}onwards {bookingData.pickUpTime}
-                </span>
-              </div>
-              <div className="flex bookings-deatils-option no-border">
-                <span>Edit</span>
-              </div>
-            </div>
-          </div>
-        </div>
+          ))}
       </div>
     </div>
   );

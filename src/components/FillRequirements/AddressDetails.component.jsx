@@ -9,12 +9,18 @@ import { StandaloneSearchBox, useJsApiLoader } from "@react-google-maps/api";
 
 function AddressDetails({progress, packageSel, cft, totalItemCount }) {
 
+  let totalCostRedux = useSelector((state) => state.TotalCostItems);
+  const [basePrice, setBasePrice] = useState(useSelector((state)=> state.TotalCostItems.basePrice));
+  const [floorCharges, setFloorCharges] = useState(useSelector((state)=> state.TotalCostItems.floorCharges));
+  const [totalBox, setTotalBox] = useState(useSelector((state)=> state.TotalCostItems.totalBox));
+  const [totalBoxPrice, setTotalBoxPrice] = useState(useSelector((state)=> state.TotalCostItems.totalBoxPrice));
+  const [weekend, setWeekend] = useState(useSelector((state)=> state.TotalCostItems.isWeekend));
+  const [totalCost, setTotalCost] = useState(0);
+  const [totalCostBF, setTotalCostBF] = useState(0);
   const libraries = ['places'];
   const inputRefFrom = React.useRef();
   const inputRefTo = React.useRef();
   const dispatch = useDispatch();
-  // let ITEMADDED = useSelector((state) => state.selectedItems);
-  // let Requirements = useSelector((state) => state.RequirementsItems);
   let AddOnsADDED = useSelector((state) => state.addOnsItems);
   
   useEffect(() => {
@@ -26,39 +32,55 @@ function AddressDetails({progress, packageSel, cft, totalItemCount }) {
     }
     setAddonsPrice(calculatedTotalPrice);
   }, [AddOnsADDED]);
+  
+
+  useEffect(() => {
+    if (totalCostRedux) {
+      setTotalCostBF(totalCostRedux.totalCostBF); 
+      setBasePrice(totalCostRedux.basePrice);
+      setFloorCharges(totalCostRedux.floorCharges); 
+      setTotalBoxPrice(totalCostRedux.totalBoxPrice); 
+      setTotalBox(totalCostRedux.totalBox); 
+      setWeekend(totalCostRedux.isWeekend); 
+    }
+  }, [totalCostRedux]);
 
   const [fromAddress, setFromAddress] = useState(sessionStorage.getItem('fromAddress'));
   const [toAddress, setToAddress] = useState(sessionStorage.getItem('toAddress'));
   const [distance, setDistance] = useState(sessionStorage.getItem('distance'));
   const [disabled, setDisabled] = useState(true);
   const [addonsPrice, setAddonsPrice] = useState('');
-  const [basePrice, setBasePrice] = useState(0);
-  const [floorCharges, setFloorCharges] = useState(0);
-  const [totalCost, setTotalCost] = useState(0);
-  const [totalCostBF, setTotalCostBF] = useState(0);
+  const [surgePrice, setSurgePrice] = useState(0);
 
-  const newTotalCost = addonsPrice + floorCharges + basePrice + (packageSel.price ? packageSel.price : 0);
-  const newTotalCostBF = floorCharges + basePrice;
+  const newTotalCost = addonsPrice + totalCostBF + (packageSel.price ? packageSel.price : 0) + totalBoxPrice;
+
+  useEffect(() => {
+    if(weekend) {
+      setSurgePrice(Math.round((addonsPrice + totalCostBF + totalBoxPrice) * 0.2));
+    } else {
+      setSurgePrice(0);
+    }
+  }, [weekend, newTotalCost]);
+
 
   useEffect(() => {
     let totalcostData = {
-      "BasePrice": basePrice,
-      "FloorCharges": floorCharges,
       "totalItemCount": totalItemCount,
       "cft": cft,
       "addonsPrice": addonsPrice,
       "packaging": packageSel.packageName,
       "packagingPrice": packageSel.price,
       "totalCost": newTotalCost,
-      "totalCostBF": newTotalCostBF,
+      "surgePrice": weekend ? Math.round((addonsPrice + totalCostBF + totalBoxPrice) * 0.2) : 0,
+      "surgedTotalCost": weekend ? Math.round((addonsPrice + totalCostBF + totalBoxPrice) * 1.2) : newTotalCost,
     }
 
-    setTotalCost(addonsPrice + floorCharges + basePrice + (packageSel.price ? packageSel.price : 0));
-    setTotalCostBF(floorCharges +  basePrice);
+    setTotalCost(addonsPrice + totalCostBF + (packageSel.price ? packageSel.price : 0) + totalBoxPrice);
     dispatch(updateTotalCost(totalcostData));
 
-  }, [floorCharges, addonsPrice, basePrice, packageSel, cft,newTotalCost , newTotalCostBF]);
+  }, [totalCostBF, addonsPrice, packageSel, cft, newTotalCost, weekend]);
 
+  console.log("totalcost ", totalCostRedux);
   useEffect(() => {
     if(!disabled) {
       calculateDistance();
@@ -71,6 +93,9 @@ function AddressDetails({progress, packageSel, cft, totalItemCount }) {
   });
 
   const handleFromPlaceChanged = () => {
+    if(!inputRefFrom?.current?.getPlaces()){
+      return;
+    }
     const [place] = inputRefFrom.current.getPlaces();
     if (place) {
       setFromAddress(place.formatted_address);
@@ -78,6 +103,7 @@ function AddressDetails({progress, packageSel, cft, totalItemCount }) {
   };
 
   const handleToPlaceChanged = () => {
+    if(!inputRefTo?.current?.getPlaces()) return;
     const [place] = inputRefTo.current.getPlaces();
     if (place) {
       setToAddress(place.formatted_address);
@@ -113,7 +139,6 @@ function AddressDetails({progress, packageSel, cft, totalItemCount }) {
       );
     }
   }
-
   return (
     <div className="requirements-section-2 flex">
     {progress === 'progress' ? ('') : (
@@ -125,15 +150,19 @@ function AddressDetails({progress, packageSel, cft, totalItemCount }) {
         <div className="cost-details">
             <div className="cost-details-child"> 
               <span>Base Price</span>
-              <span></span>
+              <span>₹{basePrice}</span>
             </div>
             <div className="cost-details-child"> 
               <span>Floor Charges</span>
-              <span></span>
+              <span>₹{floorCharges}</span>
             </div>
             <div className="cost-details-child"> 
               <span>Total Items Added</span>
               <span>{totalItemCount}</span>
+            </div>
+            <div className="cost-details-child"> 
+              <span>Additional Boxes (per Box ₹100)</span>
+              <span>{totalBox}</span>
             </div>
             <div className="cost-details-child"> 
               <span>CFT</span>
@@ -144,12 +173,16 @@ function AddressDetails({progress, packageSel, cft, totalItemCount }) {
               <span>₹{addonsPrice}</span>
             </div>
             <div className="cost-details-child"> 
+              <span>Weekend Surge</span>
+              <span>₹{surgePrice}</span>
+            </div>
+            <div className="cost-details-child"> 
               <span>Packaging</span>
               <span>₹{packageSel.price}</span>
             </div>
             <div className="cost-details-child cost-line"> 
               <span>Total Cost: </span>
-              <span className="highlightcost">₹{totalCost}</span>
+              <span className="highlightcost">₹{totalCost + surgePrice}</span>
             </div>
         </div>
       </div>
@@ -177,7 +210,7 @@ function AddressDetails({progress, packageSel, cft, totalItemCount }) {
             onLoad={ref => (inputRefFrom.current = ref)} 
             onPlacesChanged={handleFromPlaceChanged} 
           >
-            <input type="text" className="form-control" disabled={disabled || progress !== 'requirement'} placeholder={fromAddress}/>
+            <input type="text" className="form-control" disabled={disabled || progress !== 'requirement'} placeholder={fromAddress ? fromAddress : 'From Location'}/>
           </StandaloneSearchBox>
         )}
       </div>
@@ -187,7 +220,7 @@ function AddressDetails({progress, packageSel, cft, totalItemCount }) {
             onLoad={ref => (inputRefTo.current = ref)} 
             onPlacesChanged={handleToPlaceChanged} 
           >
-            <input type="text" className="form-control" disabled={disabled || progress !== 'requirement'} placeholder={toAddress} />
+            <input type="text" className="form-control" disabled={disabled || progress !== 'requirement'} placeholder={toAddress ? toAddress :  'To Location'} />
           </StandaloneSearchBox>
         )}
       </div>

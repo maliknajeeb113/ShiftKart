@@ -10,7 +10,7 @@ function DateOption({ onSelect, selectedDayValue }) {
   const [priceRed, setPriceRed] = useState(0);
 
   useEffect(() => {
-      setPriceRed(totalCost.totalCostBF);
+      setPriceRed(totalCost.totalCost ? totalCost.totalCost : 0);
   }, [totalCost]);
 
   const weekdays = [
@@ -29,23 +29,24 @@ function DateOption({ onSelect, selectedDayValue }) {
     const today = new Date();
     const days = [];
 
-    for (let i = 0; i < 15; i++) {
-      const currentDate = new Date(today);
-      currentDate.setDate(today.getDate() + i);
+    for (let i = 0; i < 30; i++) {
+      const bookingDate = new Date(today);
+      bookingDate.setDate(today.getDate() + i);
 
-      const dayOfWeek = weekdays[currentDate.getDay()];
-      const date = currentDate.getDate();
+      const dayOfWeek = weekdays[bookingDate.getDay()];
+      const date = bookingDate.getDate();
 
       let price = Number(priceRed); // Ensure price is a number
       let isWeekend = false;
       
-      if (currentDate.getDay() === 0 || currentDate.getDay() === 6) {
+      if (bookingDate.getDay() === 0 || bookingDate.getDay() === 6) {
         // Weekend (Sunday or Saturday)
         price = price * 1.2; // Ensure price is a number for multiplication
         isWeekend = true;
       }
+      const currentDate=new Date();
       
-      days.push({ dayOfWeek, date, price, isWeekend, currentDate });
+      days.push({ dayOfWeek, date, price, isWeekend, bookingDate, currentDate });
     }
 
     return days;
@@ -72,7 +73,7 @@ function DateOption({ onSelect, selectedDayValue }) {
   const closeModal = () => {
     setModalOpen(false);
   };
-  
+  console.log(generatedData)
   return (
     <div className="day-box">
       {generatedData.map((day, index) => (
