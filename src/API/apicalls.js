@@ -78,9 +78,10 @@ export const sendLoginRequestToBackend = async (data) => {
 export const sendBasePriceRequestToBackend = async (data) => {
   
   try {
-    const response = await instance.put('/basePrice', data);
-    console.log(response , 'base proce API');
-    return response.data;
+    console.log("final data to send backend : ", data);
+    // const response = await axios.get('http://localhost:3001/login', {params :data});
+    // return response.data;
+    return "Login Sucessfull..."
   } catch (error) {
     handleApiError(error);
   }

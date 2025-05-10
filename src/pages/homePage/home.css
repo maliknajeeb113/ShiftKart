@@ -46,6 +46,23 @@
 }
 
 
+
+
+
+
+/* Media query for smaller devices (adjust max-width as needed) */
+@media (max-width: 992px) {
+  .home-relocate-wrapper {
+    top: 80px; 
+    position: sticky;
+    top: 0; /* Adjust this value based on your desired spacing from the top */
+    z-index: 10; /* Adjust the z-index as needed */
+    background-color: #fff; /* Background color for the sticky area */
+    padding: 20px; /* Add padding to create space around the content */
+    
+  }
+}
+
 /* service Containers */
 
 
@@ -87,22 +104,51 @@
     width: 20%;
 }
 
+.container-h2 {
+    padding-top: 0; /* Remove or adjust top margin */
+    margin-bottom: 10px; /* Adjust bottom margin as needed */
+  }
 
 /* service Container home */ 
-.container-service, .container-process {
+.container-service{
     background-size: cover;
     padding-top: 5rem;
     position: relative;
 }
 
-/* process Container home */ 
 .container-process {
     background-size: cover;
     height: 40rem;
-    padding-top: 3rem;
+    padding-top: 2rem;
     position: relative;
-    background-image: url('../../images/1bg.svg');
 }
+
+/* process Container home */ 
+.container-process {
+    background-image: url('../../images/1bg.svg');
+    background-size: cover; /* Adjust as needed */
+   background-repeat: no-repeat; /* Adjust as needed */
+   background-position: center center;
+   max-width: 100%;
+
+}
+
+.container-table {
+    background-size: cover;
+    height: 40rem;
+    position: relative;
+}
+
+/* process Container home */ 
+.container-table {
+    background-image: url('../../images/1bg.svg');
+    background-size: cover; /* Adjust as needed */
+   background-repeat: no-repeat; /* Adjust as needed */
+   background-position: center center;
+   max-width: 100%;
+
+}
+
 .img-right-sticky-process {
     position: absolute;
     bottom: 0; 
@@ -209,6 +255,7 @@
       background-color: #fff; /* Background color for the sticky area */
       padding: 1rem 0.5rem; /* Add padding to create space around the content */
       
+
     }
     .section-container {
         position: relative;
@@ -241,6 +288,7 @@
         width: 100%;
         margin-left: 0;
     }
+
   }@media (max-width: 900px) {
     .img-right-sticky {
         width: 25%;
@@ -289,6 +337,11 @@
         width: 100%;
         margin-left: 0;
     }
+
+    .landing-img {
+        width: 20rem;
+        margin-top: 5rem;
+    }
     .services-row-one{
         gap: 2rem;
         margin-bottom: 2rem;
@@ -300,7 +353,8 @@
     .process-row-one {
         margin-top: 2rem;
         gap: 1rem;
-    }
+  }
+
     .container-blogs {
         height: 100%;
     }
